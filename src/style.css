@@ -35,3 +35,108 @@ html, body {
   text-transform: uppercase;
   letter-spacing: 0.15em;
 }
+
+.reticle {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  transform: translate(-50%, -50%);
+  border: 2px solid var(--cyan);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--cyan);
+  transition: transform 0.08s ease-out;
+}
+.reticle::after {
+  content: '';
+  position: absolute;
+  inset: 11px;
+  background: var(--cyan);
+  border-radius: 50%;
+}
+.reticle.kick { transform: translate(-50%, -50%) scale(1.6); }
+.reticle.empty { border-color: var(--red); box-shadow: 0 0 8px var(--red); }
+.reticle.empty::after { background: var(--red); }
+
+.score {
+  position: absolute;
+  top: 24px;
+  right: 32px;
+  font-size: 28px;
+  text-shadow: 0 0 10px var(--cyan);
+}
+
+.combo {
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 44px;
+  font-weight: bold;
+  text-shadow: 0 0 14px currentColor;
+}
+.combo.pulse { animation: combo-pulse 0.18s ease-out; }
+.combo.shatter { animation: combo-shatter 0.45s ease-out; }
+@keyframes combo-pulse {
+  0% { transform: translateX(-50%) scale(1.35); }
+  100% { transform: translateX(-50%) scale(1); }
+}
+@keyframes combo-shatter {
+  0% { transform: translateX(-50%) scale(2.4) rotate(-6deg); color: var(--red); filter: saturate(0); }
+  60% { color: var(--red); filter: saturate(0); }
+  100% { transform: translateX(-50%) scale(1); filter: saturate(1); }
+}
+
+.ammo {
+  position: absolute;
+  bottom: 28px;
+  right: 32px;
+  font-size: 22px;
+  color: var(--yellow);
+  text-shadow: 0 0 8px var(--yellow);
+}
+.ammo.empty { color: var(--red); text-shadow: 0 0 8px var(--red); }
+
+.health {
+  position: absolute;
+  top: 24px;
+  left: 32px;
+  font-size: 22px;
+  color: var(--green);
+  text-shadow: 0 0 8px var(--green);
+}
+.health.low { color: var(--red); text-shadow: 0 0 8px var(--red); }
+
+.progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: rgba(0, 240, 255, 0.15);
+}
+.progress-fill { height: 100%; background: var(--cyan); box-shadow: 0 0 6px var(--cyan); }
+
+.damage-flash {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(255, 31, 61, 0.55) 100%);
+}
+.damage-flash.on { animation: damage 0.35s ease-out; }
+@keyframes damage { 0% { opacity: 1; } 100% { opacity: 0; } }
+
+.end-screen {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background: rgba(10, 10, 15, 0.82);
+  font-size: 22px;
+}
+.end-screen.on { display: flex; }
+.end-screen h1 { font-size: 52px; text-shadow: 0 0 18px var(--cyan); }
+.end-screen .restart { margin-top: 24px; color: var(--yellow); animation: blink 1s step-end infinite; }
+@keyframes blink { 50% { opacity: 0.2; } }
