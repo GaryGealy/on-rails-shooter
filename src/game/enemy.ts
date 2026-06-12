@@ -11,6 +11,7 @@ export class Thug {
   readonly hitMesh: THREE.Mesh; // the raycast target
   private bodyMat: THREE.MeshStandardMaterial;
   private coreMat: THREE.MeshBasicMaterial;
+  private coreMesh: THREE.Mesh;
   private flashLeft = 0;
 
   constructor(readonly anchor: THREE.Vector3, distance: number) {
@@ -30,6 +31,7 @@ export class Thug {
     this.coreMat = new THREE.MeshBasicMaterial({ color: CORE_COLOR });
     const core = new THREE.Mesh(new THREE.SphereGeometry(0.12, 12, 12), this.coreMat);
     core.position.set(0, 1.1, 0.3);
+    this.coreMesh = core;
     this.group.add(core);
   }
 
@@ -54,15 +56,17 @@ export class Thug {
     // Stand on the camera→anchor line at brain.distance, feet on the ground.
     const dir = this.anchor.clone().sub(playerPos);
     dir.y = 0;
-    dir.normalize();
-    this.group.position.copy(playerPos).add(dir.multiplyScalar(this.brain.distance));
-    this.group.position.y = 0;
-    this.group.lookAt(playerPos.x, 0, playerPos.z);
+    if (dir.lengthSq() >= 0.0001) {
+      dir.normalize();
+      this.group.position.copy(playerPos).add(dir.multiplyScalar(this.brain.distance));
+      this.group.position.y = 0;
+      this.group.lookAt(playerPos.x, 0, playerPos.z);
+    }
 
     // Windup telegraph: core pulses toward white-hot.
     const w = this.brain.windupProgress;
     this.coreMat.color.setHex(CORE_COLOR).lerp(new THREE.Color(0xffffff), w * 0.8);
-    this.group.children[1].scale.setScalar(1 + w * 1.5);
+    this.coreMesh.scale.setScalar(1 + w * 1.5);
 
     return result;
   }
@@ -72,7 +76,7 @@ export class Thug {
     this.flashLeft = FLASH_DURATION;
     // Flash-on-hit: whole silhouette blasts white for a few frames.
     this.bodyMat.color.setHex(0xffffff);
-    this.bodyMat.emissive = new THREE.Color(0xffffff);
+    this.bodyMat.emissive.setHex(0xffffff);
     this.coreMat.color.setHex(0xffffff);
   }
 
