@@ -123,6 +123,7 @@ window.addEventListener('resize', () => {
   camera.updateProjectionMatrix();
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(window.innerWidth, window.innerHeight);
+  composer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   composer.setSize(window.innerWidth, window.innerHeight);
 });
 
