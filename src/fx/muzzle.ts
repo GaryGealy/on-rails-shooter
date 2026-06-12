@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 const PEAK = 30;
-const DECAY = 220; // intensity units per second — 1–2 frame spike per spec
+const DECAY = 900; // intensity units per second — ~1–2 frame bloom spike per spec
 
 export class MuzzleFlash {
   private light: THREE.PointLight;

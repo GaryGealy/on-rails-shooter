@@ -12,7 +12,9 @@ Designed in the `idea-forge` lab (as `cyberpunk-rail-shooter`); this repo is the
 
 ## Status
 
-Design complete; not yet implemented. Suggested first build slice: spline camera + one enemy type + core hit/combo juice — the vertical slice that proves the loop feels good before investing in three levels of content and the post-processing look.
+**Core-feel vertical slice implemented** (branch `feat/core-feel-slice`): spline rail camera through a greybox neon street, Street Thug waves from a t-keyed spawn table, hitscan fire/reload, combo multiplier with break, hit-stop on kills, ceiling-capped screen shake, particle bursts, bloom + vignette post, DOM HUD, procedural SFX. Run `npm install && npm run dev`.
+
+Next: validate the feel, then decide whether to invest in the full three-level build (remaining enemy archetypes, boss, grades, leaderboard, real audio).
 
 ## Stack (planned)
 
