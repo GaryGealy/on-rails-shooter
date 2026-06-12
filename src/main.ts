@@ -10,6 +10,7 @@ import { EnemyManager } from './game/enemies';
 import { Gunner } from './game/gunner';
 import { SparkSystem } from './fx/sparks';
 import { MuzzleFlash } from './fx/muzzle';
+import { Hud } from './hud/hud';
 
 // --- Renderer / scene / camera ---
 const canvas = document.querySelector<HTMLCanvasElement>('#game')!;
@@ -35,11 +36,25 @@ const RAIL_POINTS = [
 const rail = new Rail(RAIL_POINTS, 1 / 60);
 
 // --- Core state ---
-const combo = new ComboTracker();
+const MAX_HEALTH = 5;
+const hud = new Hud();
+let gameOver = false;
+
+const combo = new ComboTracker((e) => {
+  if (e === 'hit') hud.onComboHit();
+  if (e === 'break') hud.onComboBreak();
+});
 const magazine = new Magazine(8, 1.2);
 const hitStop = new HitStop();
 const shake = new ScreenShake(0.15);
-let health = 5;
+let health = MAX_HEALTH;
+
+// --- Restart helper: 500ms delay so the killing shot doesn't instantly restart ---
+const armRestart = () =>
+  setTimeout(
+    () => window.addEventListener('pointerdown', () => location.reload(), { once: true }),
+    500,
+  );
 
 // --- Encounters: ramping waves of thugs keyed to rail t ---
 const TABLE: SpawnEntry[] = [
@@ -63,6 +78,7 @@ const enemies = new EnemyManager(scene, {
     health = Math.max(0, health - 1);
     combo.registerPlayerHit();
     shake.addTrauma(0.5);
+    hud.onDamage();
   },
   onDeath: (corePos) => {
     sparks.deathBurst(corePos);
@@ -74,6 +90,7 @@ const enemies = new EnemyManager(scene, {
 const raycaster = new THREE.Raycaster();
 const gunner = new Gunner(magazine, {
   onFire: (ndc) => {
+    hud.onFire();
     muzzle.fire();
     raycaster.setFromCamera(ndc, camera);
 
@@ -138,6 +155,30 @@ renderer.setAnimationLoop((now) => {
   camera.position.x += shake.offsetX;
   camera.position.y += shake.offsetY;
   camera.lookAt(camLook);
+
+  hud.update({
+    score: combo.score,
+    multiplier: combo.multiplier,
+    streak: combo.streak,
+    rounds: magazine.rounds,
+    capacity: magazine.capacity,
+    reloading: magazine.reloading,
+    health,
+    maxHealth: MAX_HEALTH,
+    t: rail.t,
+  });
+
+  if (!gameOver) {
+    if (health <= 0) {
+      gameOver = true;
+      hud.showEnd('FLATLINED', combo.score, combo.accuracy);
+      armRestart();
+    } else if (rail.finished && enemies.aliveCount === 0) {
+      gameOver = true;
+      hud.showEnd('RUN COMPLETE', combo.score, combo.accuracy);
+      armRestart();
+    }
+  }
 
   renderer.render(scene, camera);
 });
