@@ -46,4 +46,23 @@ describe('ThugBrain', () => {
     expect(b.update(5)).toBe(null);
     expect(b.distance).toBe(d);
   });
+
+  it('windupProgress is 0 outside windup and tracks the telegraph', () => {
+    const b = make();
+    expect(b.windupProgress).toBe(0); // approach
+    b.update(2); // reach melee, windup begins
+    expect(b.windupProgress).toBe(0);
+    b.update(0.5);
+    expect(b.windupProgress).toBeCloseTo(0.5);
+    b.update(0.5); // attack fires, recover
+    expect(b.windupProgress).toBe(0);
+  });
+
+  it('kill() during windup prevents the pending attack', () => {
+    const b = make();
+    b.update(2); // windup begins
+    b.kill();
+    expect(b.update(1.0)).toBe(null);
+    expect(b.state).toBe('dead');
+  });
 });
