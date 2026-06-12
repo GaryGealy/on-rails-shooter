@@ -52,5 +52,7 @@ describe('Rail', () => {
     rail.update(2); // t = 1
     const look = rail.lookTarget(new Vector3());
     expect(Number.isFinite(look.x)).toBe(true);
+    const end = rail.position(new Vector3());
+    expect(look.distanceTo(end)).toBeGreaterThan(0.5);
   });
 });

@@ -6,6 +6,7 @@ export class Rail {
   readonly curve: CatmullRomCurve3;
   t = 0;
   paused = false;
+  private readonly scratch = new Vector3();
 
   constructor(
     points: Vector3[],
@@ -31,7 +32,7 @@ export class Rail {
     // Sample ahead; at the rail's end, extrapolate along the final tangent
     // so the camera doesn't look at its own position.
     if (this.t >= 1 - LOOK_AHEAD) {
-      const tangent = this.curve.getTangentAt(1, target.clone());
+      const tangent = this.curve.getTangentAt(1, this.scratch);
       return this.curve.getPointAt(1, target).add(tangent.multiplyScalar(2));
     }
     return this.curve.getPointAt(this.t + LOOK_AHEAD, target);
