@@ -11,6 +11,7 @@ import { Gunner } from './game/gunner';
 import { SparkSystem } from './fx/sparks';
 import { MuzzleFlash } from './fx/muzzle';
 import { Hud } from './hud/hud';
+import { createComposer } from './fx/post';
 
 // --- Renderer / scene / camera ---
 const canvas = document.querySelector<HTMLCanvasElement>('#game')!;
@@ -23,6 +24,7 @@ buildStreet(scene);
 
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 200);
 scene.add(camera); // so camera-attached lights (muzzle flash) render
+const composer = createComposer(renderer, scene, camera);
 
 // --- Rail ---
 const RAIL_POINTS = [
@@ -121,6 +123,7 @@ window.addEventListener('resize', () => {
   camera.updateProjectionMatrix();
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(window.innerWidth, window.innerHeight);
+  composer.setSize(window.innerWidth, window.innerHeight);
 });
 
 const camPos = new THREE.Vector3();
@@ -180,5 +183,5 @@ renderer.setAnimationLoop((now) => {
     }
   }
 
-  renderer.render(scene, camera);
+  composer.render();
 });
