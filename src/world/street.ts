@@ -35,9 +35,14 @@ export function buildStreet(scene: THREE.Scene): void {
       sign.position.set(side * (8 + (i % 3)) - side * 3.2, 3 + (i % 5), z);
       scene.add(sign);
 
-      const light = new THREE.PointLight(color, 12, 14);
-      light.position.copy(sign.position).x -= side * 0.6;
-      scene.add(light);
+      // Forward rendering pays for every light per fragment: 48 sign lights drove
+      // an M1 from 60fps to ~10fps. 16 (every 3rd row) holds 60fps and reads the
+      // same — the signs themselves glow via emissive + bloom, not these lights.
+      if (i % 3 === 0) {
+        const light = new THREE.PointLight(color, 12, 14);
+        light.position.copy(sign.position).x -= side * 0.6;
+        scene.add(light);
+      }
     }
   }
 }
