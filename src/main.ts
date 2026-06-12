@@ -12,6 +12,7 @@ import { SparkSystem } from './fx/sparks';
 import { MuzzleFlash } from './fx/muzzle';
 import { Hud } from './hud/hud';
 import { createComposer } from './fx/post';
+import { Sfx } from './audio/sfx';
 
 // --- Renderer / scene / camera ---
 const canvas = document.querySelector<HTMLCanvasElement>('#game')!;
@@ -42,9 +43,12 @@ const MAX_HEALTH = 5;
 const hud = new Hud();
 let gameOver = false;
 
+const sfx = new Sfx();
+window.addEventListener('pointerdown', () => sfx.unlock(), { once: true });
+
 const combo = new ComboTracker((e) => {
-  if (e === 'hit') hud.onComboHit();
-  if (e === 'break') hud.onComboBreak();
+  if (e === 'hit') { hud.onComboHit(); sfx.comboTick(combo.streak); }
+  if (e === 'break') { hud.onComboBreak(); sfx.comboBreak(); }
 });
 const magazine = new Magazine(8, 1.2);
 const hitStop = new HitStop();
@@ -81,10 +85,12 @@ const enemies = new EnemyManager(scene, {
     combo.registerPlayerHit();
     shake.addTrauma(0.5);
     hud.onDamage();
+    sfx.damage();
   },
   onDeath: (corePos) => {
     sparks.deathBurst(corePos);
     hitStop.onKill();
+    sfx.kill();
   },
 });
 
@@ -93,6 +99,7 @@ const raycaster = new THREE.Raycaster();
 const gunner = new Gunner(magazine, {
   onFire: (ndc) => {
     hud.onFire();
+    sfx.fire();
     muzzle.fire();
     raycaster.setFromCamera(ndc, camera);
 
@@ -112,8 +119,8 @@ const gunner = new Gunner(magazine, {
         : raycaster.ray.at(40, new THREE.Vector3());
     sparks.hitSpark(point);
   },
-  onEmpty: () => {},  // SFX in Task 14
-  onReload: () => {}, // SFX in Task 14
+  onEmpty: () => { sfx.empty(); },
+  onReload: () => { sfx.reload(); },
 });
 void gunner;
 
