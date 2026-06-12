@@ -112,7 +112,7 @@ const railDir = new THREE.Vector3();
 let last = performance.now();
 
 renderer.setAnimationLoop((now) => {
-  const realDt = Math.min(0.05, (now - last) / 1000);
+  const realDt = Math.min(0.05, Math.max(0, (now - last) / 1000));
   last = now;
 
   hitStop.update(realDt);

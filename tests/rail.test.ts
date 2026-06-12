@@ -55,4 +55,11 @@ describe('Rail', () => {
     const end = rail.position(new Vector3());
     expect(look.distanceTo(end)).toBeGreaterThan(0.5);
   });
+
+  it('never goes below t=0 on negative dt (first-frame rAF timestamp skew)', () => {
+    const rail = new Rail(POINTS, 0.1);
+    rail.update(-0.005);
+    expect(rail.t).toBe(0);
+    expect(Number.isFinite(rail.position(new Vector3()).x)).toBe(true);
+  });
 });

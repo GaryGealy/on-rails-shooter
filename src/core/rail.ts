@@ -21,7 +21,7 @@ export class Rail {
 
   update(dt: number): void {
     if (this.paused || this.finished) return;
-    this.t = Math.min(1, this.t + this.speed * dt);
+    this.t = Math.min(1, Math.max(0, this.t + this.speed * dt));
   }
 
   position(target: Vector3): Vector3 {
