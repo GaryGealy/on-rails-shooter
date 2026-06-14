@@ -42,7 +42,7 @@ export function createComposer(
 
   const bloom = new UnrealBloomPass(
     new THREE.Vector2(window.innerWidth, window.innerHeight),
-    0.45, // strength — restrained so neon glows without blowing out
+    0.34, // strength — restrained so neon glows without blowing out
     0.5,  // radius
     0.35, // threshold — only the brightest emissives bloom
   );
