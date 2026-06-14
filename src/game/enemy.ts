@@ -1,13 +1,12 @@
 import * as THREE from 'three';
 import { ThugBrain } from '../core/enemy-brain';
 
-const BODY_COLOR = 0x101018;
-// Threat-red self-glow (palette: red = danger/threat). Without it the near-black
-// body vanishes anywhere it isn't directly backlit by a sign — which is most of
-// the corridor. Emissive + bloom makes the thug read as a hostile glowing figure
-// at any distance, at zero per-frame cost.
-const BODY_EMISSIVE = 0xff1f3d;
-const BODY_EMISSIVE_INTENSITY = 0.8;
+// Chrome body: metalness picks up the scene's environment map (set in main.ts)
+// plus colored specular glints from nearby neon, so it reads as a reflective
+// figure against the dark corridor without any self-illumination.
+const BODY_COLOR = 0xd0d4dc;
+const BODY_METALNESS = 0.9;
+const BODY_ROUGHNESS = 0.35;
 const CORE_COLOR = 0xff2bd6;
 const FLASH_DURATION = 0.07; // seconds of white flash on death
 
@@ -31,9 +30,8 @@ export class Thug {
 
     this.bodyMat = new THREE.MeshStandardMaterial({
       color: BODY_COLOR,
-      roughness: 0.9,
-      emissive: new THREE.Color(BODY_EMISSIVE),
-      emissiveIntensity: BODY_EMISSIVE_INTENSITY,
+      metalness: BODY_METALNESS,
+      roughness: BODY_ROUGHNESS,
     });
     this.hitMesh = new THREE.Mesh(new THREE.CapsuleGeometry(0.35, 1.0, 4, 12), this.bodyMat);
     this.hitMesh.position.y = 0.85;
