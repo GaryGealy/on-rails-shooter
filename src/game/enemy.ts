@@ -2,6 +2,12 @@ import * as THREE from 'three';
 import { ThugBrain } from '../core/enemy-brain';
 
 const BODY_COLOR = 0x101018;
+// Threat-red self-glow (palette: red = danger/threat). Without it the near-black
+// body vanishes anywhere it isn't directly backlit by a sign — which is most of
+// the corridor. Emissive + bloom makes the thug read as a hostile glowing figure
+// at any distance, at zero per-frame cost.
+const BODY_EMISSIVE = 0xff1f3d;
+const BODY_EMISSIVE_INTENSITY = 0.8;
 const CORE_COLOR = 0xff2bd6;
 const FLASH_DURATION = 0.07; // seconds of white flash on death
 
@@ -23,13 +29,18 @@ export class Thug {
       recover: 1.5,
     });
 
-    this.bodyMat = new THREE.MeshStandardMaterial({ color: BODY_COLOR, roughness: 0.9 });
+    this.bodyMat = new THREE.MeshStandardMaterial({
+      color: BODY_COLOR,
+      roughness: 0.9,
+      emissive: new THREE.Color(BODY_EMISSIVE),
+      emissiveIntensity: BODY_EMISSIVE_INTENSITY,
+    });
     this.hitMesh = new THREE.Mesh(new THREE.CapsuleGeometry(0.35, 1.0, 4, 12), this.bodyMat);
     this.hitMesh.position.y = 0.85;
     this.group.add(this.hitMesh);
 
     this.coreMat = new THREE.MeshBasicMaterial({ color: CORE_COLOR });
-    const core = new THREE.Mesh(new THREE.SphereGeometry(0.12, 12, 12), this.coreMat);
+    const core = new THREE.Mesh(new THREE.SphereGeometry(0.16, 12, 12), this.coreMat);
     core.position.set(0, 1.1, 0.3);
     this.coreMesh = core;
     this.group.add(core);
@@ -77,6 +88,7 @@ export class Thug {
     // Flash-on-hit: whole silhouette blasts white for a few frames.
     this.bodyMat.color.setHex(0xffffff);
     this.bodyMat.emissive.setHex(0xffffff);
+    this.bodyMat.emissiveIntensity = 1;
     this.coreMat.color.setHex(0xffffff);
   }
 
