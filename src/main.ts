@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { Rail } from './core/rail';
 import { ComboTracker } from './core/combo';
 import { Magazine } from './core/magazine';
@@ -22,6 +23,14 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 const scene = new THREE.Scene();
 buildStreet(scene);
+
+// Image-based lighting: gives metallic/chrome surfaces something to reflect and
+// lifts the whole scene out of pure black. environmentIntensity keeps it subtle
+// so the corridor stays noir.
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+scene.environmentIntensity = 0.4;
+pmrem.dispose();
 
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 200);
 scene.add(camera); // so camera-attached lights (muzzle flash) render
